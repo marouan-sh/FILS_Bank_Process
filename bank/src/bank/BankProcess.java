@@ -26,6 +26,8 @@ public class BankProcess {
 			String concept = ProcessInputUtils.readConcept();
 			double amount = ProcessInputUtils.readAmount();
 
+			// monitor.writeOperation(operation, concept, amount);
+
 			monitor.writeOperation(operation, concept, amount);
 
 			seguir = ProcessInputUtils.confirmAnotherOperation();

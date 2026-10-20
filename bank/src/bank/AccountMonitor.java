@@ -28,11 +28,30 @@ public class AccountMonitor {
 
 		String linea = fecha + " | " + operacion + " | " + concept + " | " + signo + importe + " €\n";
 
-		try (FileOutputStream fos = new FileOutputStream(fileName, true);
-				FileLock lock = fos.getChannel().lock()) {
+		try (FileOutputStream fos = new FileOutputStream(fileName, true); FileLock lock = fos.getChannel().lock()) {
 			fos.write(linea.getBytes(StandardCharsets.UTF_8));
 		} catch (IOException e) {
 			System.err.println("Error: " + e.getMessage());
 		}
 	}
+
+	// Version mala sin el lock
+	public void writeOperationSinLock(Operation operation, String concept, double amount) {
+		String fecha = LocalDateTime.now().format(FORMATTER);
+		String operacion = operation.toString();
+		String signo = operation.sign();
+		String importe = String.format(Locale.ROOT, "%.2f", amount);
+
+		String linea = fecha + " | " + operacion + " | " + concept + " | " + signo + importe + " €\n";
+
+		try (FileOutputStream fos = new FileOutputStream(fileName, true)) { // sin lock()
+			for (char c : linea.toCharArray()) {
+				fos.write(String.valueOf(c).getBytes(StandardCharsets.UTF_8));
+				Thread.sleep(100); // escribe despacio para que se vea la mezcla
+			}
+		} catch (IOException | InterruptedException e) {
+			System.err.println("Error: " + e.getMessage());
+		}
+	}
+
 }
